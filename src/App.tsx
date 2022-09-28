@@ -1,26 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from 'react';
+import { RestCountries } from './api';
+import Countries from './components/Countries';
+import CountryDetails from './components/CountryDetails';
 
-function App() {
+export default function App() {
+  const [countries, setCountries] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<any | null>(null);
+  const [country, setCountry] = useState<any | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+
+    RestCountries.all()
+      .then((response) => {
+        setCountries(response.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err);
+        setLoading(false);
+      });
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <h1>Countries App</h1>
+
+      <Countries
+        countries={countries}
+        loading={loading}
+        error={error}
+        setCountry={setCountry}
+      />
+
+      {country ? (
+        <CountryDetails country={country} setCountry={setCountry} />
+      ) : null}
+    </>
   );
 }
-
-export default App;
